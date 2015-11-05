@@ -1,10 +1,5 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-author: "RAHM"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
+RAHM  
 
 
 ## Loading and preprocessing the data
@@ -15,7 +10,8 @@ The activity data is presented in a file named activity.csv embedded in a zip fi
 2. the date those steps were taken
 3. a number indicating the interval during which those steps were taken, preferably in time format. 
 
-```{r loadData}
+
+```r
 library(plyr)
 
 activityDataUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
@@ -28,7 +24,37 @@ activity$timeInterval <- sprintf("%04d", activity$interval)
 activity$timeInterval <- as.POSIXct(format(strptime(activity$timeInterval, format="%H%M"), format = "%H:%M"), format="%H:%M")
 
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  4 variables:
+##  $ steps       : num  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date        : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval    : int  0 5 10 15 20 25 30 35 40 45 ...
+##  $ timeInterval: POSIXct, format: "2015-11-05 00:00:00" "2015-11-05 00:05:00" ...
+```
+
+```r
 summary(activity)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304                                          
+##   timeInterval                
+##  Min.   :2015-11-05 00:00:00  
+##  1st Qu.:2015-11-05 05:58:45  
+##  Median :2015-11-05 11:57:30  
+##  Mean   :2015-11-05 11:57:30  
+##  3rd Qu.:2015-11-05 17:56:15  
+##  Max.   :2015-11-05 23:55:00  
+## 
 ```
 
 
@@ -44,34 +70,40 @@ this question has a few parts:
 
 
 First, create a summary of total steps per day:
-```{r dailyTotals}
+
+```r
 ### create a daily summary file
 dailySteps <- ddply(activity, ~date, summarise, totalSteps = sum(steps))
 ### lets plot them
 barplot(dailySteps$totalSteps, names.arg = dailySteps$date, ylab = "Steps per day", col = "green")
 stepsPerDay <- mean(dailySteps[,2], na.rm = TRUE)
 abline(h=stepsPerDay, col = "red", lwd = 2)
-
 ```
+
+![](PA1_template_files/figure-html/dailyTotals-1.png) 
 Which I think looks really interesting, although I wish I could get the dates to be vertical!
 
 
 Second, plot as a histogram:
-```{r stepsPerDayHistogram}
+
+```r
 hist(dailySteps$totalSteps, n = 20, col = "green")
 ```
 
+![](PA1_template_files/figure-html/stepsPerDayHistogram-1.png) 
+
 Third, calculate the mean and the median
 
-```{r meanAndMedian}
+
+```r
 totalSteps <- sum(dailySteps$totalSteps, na.rm = TRUE)
 totalDays <-sum(!is.na(dailySteps$totalSteps))
 medianSPD <- median(dailySteps$totalSteps, na.rm = TRUE)
 ```
 
-So the mean number of steps per day is `r stepsPerDay` and the median is `r medianSPD`
+So the mean number of steps per day is 1.0766189\times 10^{4} and the median is 1.0765\times 10^{4}
 
-calculated from the total steps, `r totalSteps` taken over `r totalDays` days.
+calculated from the total steps, 5.70608\times 10^{5} taken over 53 days.
 
 *I wonder how you fix that obvious formatting problem?*
 
@@ -83,7 +115,8 @@ The average daily activity pattern, see plot below, shows a large morning peak (
 
 1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis)
 
-```{r dailyIntervalAverages}
+
+```r
 # convert the interval codes into something plottable
 # this works but its not pretty, there must be a nicer way
 
@@ -93,14 +126,17 @@ intervalSteps <- ddply(activity,~timeInterval,summarise,avgSteps=mean(steps, na.
 plot(intervalSteps, type = "l", col = "green", lwd = 2)
 ```
 
+![](PA1_template_files/figure-html/dailyIntervalAverages-1.png) 
+
 2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 
-```{r maxIntAvg}
+
+```r
 # identify the maximum interval
 maxInt <- format(intervalSteps[which.max(intervalSteps$avgSteps), 1], "%H:%M")
 ```
 
-The answer is the 5 minute interval commencing at `r maxInt`!
+The answer is the 5 minute interval commencing at 08:35!
 
 ## Imputing missing values
 
@@ -108,19 +144,20 @@ Note that there are a number of days/intervals where there are missing values (c
 
 1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs)
 
-```{r missingData}
+
+```r
 missingReadings <- sum(is.na(activity$steps))
 missingDays <- sum(is.na(dailySteps$totalSteps))
 missingIntervals <- sum(is.na(intervalSteps$avgSteps))
 ```
 
-Missing data points = `r missingReadings`
+Missing data points = 2304
 
-Missing days = `r missingDays`
+Missing days = 8
 
-Missing intervals = `r missingIntervals`
+Missing intervals = 0
 
-The missing data appears to represent `r missingDays` days of data, ie all readings for those days are missing and there are no other missing datapoints. 
+The missing data appears to represent 8 days of data, ie all readings for those days are missing and there are no other missing datapoints. 
 
 2. Devise a strategy for filling in all of the missing values in the dataset. The strategy does not need to be sophisticated. For example, you could use the mean/median for that day, or the mean for that 5-minute interval, etc.
 
@@ -141,28 +178,37 @@ For this part the weekdays() function may be of some help here. Use the dataset 
 
 1. Create a new factor variable in the dataset with two levels - "weekday" and "weekend" indicating whether a given date is a weekday or weekend day.
 
-```{r weekdayFactor}
+
+```r
 weekdays <- c('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday')
 activity$isWeekday <- factor((weekdays(activity$date) %in% weekdays), levels=c(FALSE, TRUE), labels=c('weekend', 'weekday'))
 ```
 
 2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). See the README file in the GitHub repository to see an example of what this plot should look like using simulated data.
 
-```{r weekends}
+
+```r
 # create a new dataset with the weekday and weekend interval averages only
 intervalSteps2 <- ddply(activity, .(timeInterval, isWeekday), summarise, avgSteps=mean(steps, na.rm = TRUE))
 # produce the panel plot
 library(ggplot2)
 qplot(timeInterval, avgSteps, data = intervalSteps2, facets = isWeekday~., geom = "line", col = isWeekday) + geom_line(size = 1)
-
 ```
+
+![](PA1_template_files/figure-html/weekends-1.png) 
 
 From the figure above you can see that, on average, the subject started their day later on the weekend but tended to be more active throughout the day. Perhaps this is someone who walks to work, has a job in which they are not entirely desk-bound and gets a lift home and has a generally active weekend after a bit of a sleep in?
 
 But is there a difference between the total average steps on weekends and weekdays? The table below shows that the subject took more steps, on average, on the weekend.
 
-```{r weekends2}
+
+```r
 test <- ddply(intervalSteps2, ~isWeekday, summarise, totalSteps = sum(avgSteps))
 test
+```
 
+```
+##   isWeekday totalSteps
+## 1   weekend   12406.57
+## 2   weekday   10177.33
 ```
