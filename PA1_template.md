@@ -31,7 +31,7 @@ str(activity)
 ##  $ steps       : num  NA NA NA NA NA NA NA NA NA NA ...
 ##  $ date        : Date, format: "2012-10-01" "2012-10-01" ...
 ##  $ interval    : int  0 5 10 15 20 25 30 35 40 45 ...
-##  $ timeInterval: POSIXct, format: "2015-11-05 00:00:00" "2015-11-05 00:05:00" ...
+##  $ timeInterval: POSIXct, format: "2015-11-06 00:00:00" "2015-11-06 00:05:00" ...
 ```
 
 ```r
@@ -48,12 +48,12 @@ summary(activity)
 ##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
 ##  NA's   :2304                                          
 ##   timeInterval                
-##  Min.   :2015-11-05 00:00:00  
-##  1st Qu.:2015-11-05 05:58:45  
-##  Median :2015-11-05 11:57:30  
-##  Mean   :2015-11-05 11:57:30  
-##  3rd Qu.:2015-11-05 17:56:15  
-##  Max.   :2015-11-05 23:55:00  
+##  Min.   :2015-11-06 00:00:00  
+##  1st Qu.:2015-11-06 05:58:45  
+##  Median :2015-11-06 11:57:30  
+##  Mean   :2015-11-06 11:57:30  
+##  3rd Qu.:2015-11-06 17:56:15  
+##  Max.   :2015-11-06 23:55:00  
 ## 
 ```
 
@@ -81,6 +81,7 @@ abline(h=stepsPerDay, col = "red", lwd = 2)
 ```
 
 ![](PA1_template_files/figure-html/dailyTotals-1.png) 
+
 Which I think looks really interesting, although I wish I could get the dates to be vertical!
 
 
@@ -101,11 +102,9 @@ totalDays <-sum(!is.na(dailySteps$totalSteps))
 medianSPD <- median(dailySteps$totalSteps, na.rm = TRUE)
 ```
 
-So the mean number of steps per day is 1.0766189\times 10^{4} and the median is 1.0765\times 10^{4}
+So the mean number of steps per day is 10766 and the median is 10765
 
-calculated from the total steps, 5.70608\times 10^{5} taken over 53 days.
-
-*I wonder how you fix that obvious formatting problem?*
+calculated from the total steps, 570610 taken over 53 days (without missing data).
 
 
 ## What is the average daily activity pattern?
@@ -199,7 +198,9 @@ qplot(timeInterval, avgSteps, data = intervalSteps2, facets = isWeekday~., geom 
 
 From the figure above you can see that, on average, the subject started their day later on the weekend but tended to be more active throughout the day. Perhaps this is someone who walks to work, has a job in which they are not entirely desk-bound and gets a lift home and has a generally active weekend after a bit of a sleep in?
 
-But is there a difference between the total average steps on weekends and weekdays? The table below shows that the subject took more steps, on average, on the weekend.
+*could clean up the formatting on the x axis!*
+
+But is there a difference between the total average steps on weekends and weekdays? The table below shows that the subject took more steps, on average, on the weekend.Is that difference statistically significant? Need to do the math, perhaps next time!
 
 
 ```r
@@ -211,4 +212,15 @@ test
 ##   isWeekday totalSteps
 ## 1   weekend   12406.57
 ## 2   weekday   10177.33
+```
+
+now let's clean up by removing the data files from the workspace
+
+
+```r
+file.remove("activityData.zip", "activity.csv")
+```
+
+```
+## [1] TRUE TRUE
 ```
